@@ -9,8 +9,6 @@ on:
 env:
   S3_BUCKET: my-react-example-app-front-static
   CF_DISTRIBUITION: E32GJBPX3N4Z32
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   AWS_DEFAULT_REGION: 'sa-east-1'
   
 jobs:
@@ -53,10 +51,10 @@ jobs:
         run: npm run build
 
       - name: Upload files to S3
-        run: |
-          export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-          export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws s3 sync build/ s3://${{ env.S3_BUCKET }} --delete 
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: aws s3 sync build/ s3://${{ env.S3_BUCKET }} --delete 
           
       - name: Clear Cloudfront cache
         run: aws cloudfront create-invalidation --distribution-id ${{ env.CF_DISTRIBUITION }} --paths "/*" "/*/*" "/*/*/*" "/*/*/*/*" "/*/*/*/*/*"
